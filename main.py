@@ -3,8 +3,38 @@
 import time
 
 from Centerpoint import *
+from flask import Flask, redirect, url_for, request
+import json
 
-random.seed(1)
+app = Flask(__name__)
+
+
+@app.route('/centerpoint', methods=['POST'])
+def centerpoint():
+    if request.method == 'POST':
+        ps = request.json
+
+        point_set = []
+
+        for p in ps:
+            point_set.append(Point(p[0], p[1]))
+
+        plot = False
+        start_time = time.time()
+        cp = Centerpoint(point_set, plot=plot)
+        centerpoint = cp.reduce_then_get_centerpoint()
+        # centerpoint = cp.brute_force_centerpoint()
+        print("Total time used for %d points is: %.2f s" % (100, time.time() - start_time))  
+        # plotResult(point_set, centerpoint)
+
+        res = centerpoint
+
+        res_json = json.dumps(res, default=lambda o: o.__dict__, indent=4, sort_keys=True)
+
+        print(res_json)
+
+        return res_json
+  
 
 
 def plotResult(point_set, cp):
@@ -20,13 +50,5 @@ def plotResult(point_set, cp):
 
 
 if __name__ == '__main__':
-    n = 1000  # total number of points
-    plot = False
-    start_time = time.time()
-    point_set = random_point_set(n, lower=-100, upper=100)
-    cp = Centerpoint(point_set, plot=plot)
-    centerpoint = cp.reduce_then_get_centerpoint()
-    #centerpoint = cp.brute_force_centerpoint()
-    print("Total time used for %d points is: %.2f s" % (n, time.time() - start_time))
-
-    plotResult(point_set, centerpoint)
+    # app.debug = True
+    app.run() #go to http://localhost:5000/ to view the page.

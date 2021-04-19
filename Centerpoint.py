@@ -41,25 +41,27 @@ class Centerpoint:
         self.plot = plot
 
     def reduce_then_get_centerpoint(self):
-        last_point_num = len(self.point_set)
-        cur_point_num = 0
-        print("point number: %d" % last_point_num)
-        while cur_point_num < last_point_num:
-            last_point_num = len(self.point_set)
-            self.__init__(self.point_set, plot=self.plot)
-            try:
-                self.find_L_boundary()
-                self.find_U_boundary()
-                self.find_D_boundary()
-                self.find_R_boundary()
-                self.find_intersections()
-                self.replace_points()
-                self.point_set = remove_repeat_points(self.point_set)
-                cur_point_num = len(self.point_set)
-                print("point number: %d" % cur_point_num)
-            except:
-                pass
-        return self.brute_force_centerpoint()
+
+        print("Before: %d" % len(self.point_set))
+
+        self.__init__(self.point_set, plot=self.plot)
+        self.find_L_boundary()
+        self.find_U_boundary()
+        self.find_D_boundary()
+        self.find_R_boundary()
+        self.find_intersections()
+        self.replace_points()
+        self.point_set = remove_repeat_points(self.point_set)
+
+        print("After: %d" % len(self.point_set))
+
+        return {
+            'L': self.L_boundary_line,
+            'U': self.U_boundary_line,
+            'R': self.R_boundary_line,
+            'D': self.D_boundary_line,
+            'PS': [(p.x, p.y) for p in self.point_set],
+        }
 
     def brute_force_centerpoint(self):
         centerpoints = []
